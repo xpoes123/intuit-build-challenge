@@ -1,0 +1,33 @@
+[project]
+name = "intuit-build-challenge"
+version = "0.1.0"
+description = "Intuit build challenge - producer-consumer with BlockingQueue"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "David Jiang" }
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "mypy>=1.10.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["assignment_1/tests"]
+python_files = ["test_*.py"]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["assignment_1"]
+ignore_missing_imports = true
+strict = false
+warn_return_any = true
+warn_unused_configs = true

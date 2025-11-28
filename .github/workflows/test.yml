@@ -28,3 +28,7 @@ jobs:
         run: |
           cd assignment_1
           pytest -q
+      
+      - name: Run mypy
+        run: |
+          mypy assignment_1
