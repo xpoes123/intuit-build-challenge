@@ -22,9 +22,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          python -m pip install ".[dev]"
 
       - name: Run tests
         run: |
           cd assignment_1
           pytest -q
+      
+      - name: Run mypy
+        run: |
+          mypy assignment_1
