@@ -18,12 +18,16 @@ class Producer(threading.Thread, Generic[T]):
         threading.Thread.__init__(self, name=self.name)
     
     def run(self) -> None:
-        pass
+        try:
+            for item in self.source:
+                self.queue.put(item)
+        finally:
+            self.queue.put(self.sentinel)
 
 
 @dataclass(kw_only=True, eq=False)
 class Consumer(threading.Thread, Generic[T]):
-    queue: object
+    queue: BlockingQueue[object]
     destination: List[T] = field(default_factory=list)
     sentinel: object = SENTINEL
     name: str = "consumer"
