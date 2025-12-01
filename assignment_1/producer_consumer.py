@@ -2,6 +2,7 @@ import threading
 from dataclasses import dataclass, field
 from typing import Generic, Iterable, List, TypeVar, cast
 from assignment_1.blocking_queue import BlockingQueue
+import time
 
 T = TypeVar("T")
 
@@ -44,3 +45,20 @@ class Consumer(threading.Thread, Generic[T]):
             
             value = cast(T, item)
             self.destination.append(value)
+
+
+def run_pipeline(source: Iterable[T], queue_size: int=10) -> List[T]:
+    queue: BlockingQueue[object] = BlockingQueue(max_size=queue_size)
+    destination: List[T] = []
+
+    producer: Producer[T] = Producer(source=source, queue=queue, sentinel=SENTINEL)
+    consumer: Consumer[T] = Consumer(queue=queue, destination=destination, sentinel=SENTINEL)
+
+    start = time.perf_counter()
+    producer.start()
+    consumer.start()
+
+    producer.join()
+    consumer.join()
+
+    return destination
