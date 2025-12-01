@@ -6,7 +6,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
-from assignment_1.producer_consumer import Producer, Consumer, SENTINEL
+from assignment_1.producer_consumer import Producer, Consumer, SENTINEL, run_pipeline
 from assignment_1.blocking_queue import BlockingQueue
 
 def test_producer_init() -> None:
@@ -51,3 +51,21 @@ def test_consumer_stops_on_immediate_sentinel() -> None:
 
     assert destination == []
     assert queue.is_empty() is True
+
+
+def test_run_pipeline_round_trip_basic() -> None:
+    source = [1, 2, 3, 4, 5]
+    result = run_pipeline(source, queue_size=2)
+    assert result == source
+
+
+def test_run_pipeline_handles_empty_source() -> None:
+    source: list[int] = []
+    result = run_pipeline(source, queue_size=3)
+    assert result == []
+
+
+def test_run_pipeline_preserves_none_values() -> None:
+    source: list[int | None] = [1, None, 3]
+    result = run_pipeline(source, queue_size=2)
+    assert result == [1, None, 3]
