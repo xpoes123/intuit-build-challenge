@@ -1,6 +1,6 @@
 import threading
 from dataclasses import dataclass, field
-from typing import Generic, Iterable, List, TypeVar
+from typing import Generic, Iterable, List, TypeVar, cast
 from assignment_1.blocking_queue import BlockingQueue
 
 T = TypeVar("T")
@@ -36,4 +36,11 @@ class Consumer(threading.Thread, Generic[T]):
         threading.Thread.__init__(self, name=self.name)
         
     def run(self) -> None:
-        pass
+        while True:
+            item = self.queue.get()
+            
+            if item is self.sentinel:
+                break
+            
+            value = cast(T, item)
+            self.destination.append(value)

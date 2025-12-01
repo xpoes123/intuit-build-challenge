@@ -37,3 +37,17 @@ def test_producer_enqueues_items_and_sentinel() -> None:
     assert queue.get() is SENTINEL
     
     assert queue.is_empty() is True
+
+
+def test_consumer_stops_on_immediate_sentinel() -> None:
+    queue: BlockingQueue[object] = BlockingQueue(max_size=10)
+    destination: list[int] = []
+
+    queue.put(SENTINEL)
+
+    consumer: Consumer[int] = Consumer(queue=queue, destination=destination)
+    consumer.start()
+    consumer.join(timeout=1.0)
+
+    assert destination == []
+    assert queue.is_empty() is True
