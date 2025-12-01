@@ -26,9 +26,8 @@ jobs:
 
       - name: Run tests
         run: |
-          cd assignment_1
           pytest -q
-      
+
       - name: Run mypy
         run: |
-          mypy assignment_1
+          mypy assignment_1 assignment_2
