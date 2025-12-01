@@ -62,3 +62,17 @@ def run_pipeline(source: Iterable[T], queue_size: int=10) -> List[T]:
     consumer.join()
 
     return destination
+
+
+if __name__ == "__main__":
+    sample_data = [1, 2, 3, None, 5]
+
+    print("Running producer–consumer pipeline...")
+    result = run_pipeline(sample_data, queue_size=3)
+
+    print("\n=== Pipeline Summary ===")
+    print(f"Input:       {sample_data}")
+    print(f"Output:      {result}")
+    print(f"Items in:    {len(sample_data)}")
+    print(f"Items out:   {len(result)}")
+    print("Status:      Completed successfully.")
