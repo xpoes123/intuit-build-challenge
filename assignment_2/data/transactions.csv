@@ -1,0 +1,6 @@
+transaction_id,timestamp,user_id,category,item,quantity,unit_price
+T1001,2025-01-01T10:15:00Z,U001,digital,Premium Upgrade,1,4.99
+T1002,2025-01-01T10:20:00Z,U002,physical,Notebook,3,2.50
+T1003,2025-01-02T08:00:00Z,U001,subscription,Monthly Plan,1,9.99
+T1004,2025-01-02T09:30:00Z,U003,digital,Coin Pack,5,0.99
+T1005,2025-01-03T14:10:00Z,U002,physical,Pen Set,2,3.20
