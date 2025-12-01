@@ -5,6 +5,7 @@ from os import PathLike
 from collections.abc import Iterable
 from decimal import Decimal
 from enum import StrEnum
+from collections import defaultdict
 
 import csv
 
@@ -102,3 +103,85 @@ def revenue_for_category(
         (r.revenue for r in records if r.category is category),
         start=Decimal("0"),
     )
+    
+
+def revenue_by_category(records: Iterable[TransactionRecord]) -> dict[Category, Decimal]:
+    totals: dict[Category, Decimal] = defaultdict(lambda: Decimal("0"))
+    for r in records:
+        totals[r.category] += r.revenue
+    return dict(totals)
+
+
+def revenue_by_user(records: Iterable[TransactionRecord]) -> dict[str, Decimal]:
+    totals: dict[str, Decimal] = defaultdict(lambda: Decimal("0"))
+    for r in records:
+        totals[r.user_id] += r.revenue
+    return dict(totals)
+
+
+def top_n_items_by_revenue(
+    records: Iterable[TransactionRecord],
+    n: int = 3,
+) -> list[tuple[str, Decimal]]:
+    item_totals: dict[str, Decimal] = defaultdict(lambda: Decimal("0"))
+    for r in records:
+        item_totals[r.item] += r.revenue
+
+    sorted_items = sorted(
+        item_totals.items(),
+        key=lambda kv: kv[1],
+        reverse=True,
+    )
+    return sorted_items[:n]
+
+
+def average_revenue_per_user(records: Iterable[TransactionRecord]) -> dict[str, Decimal]:
+    totals: dict[str, Decimal] = defaultdict(lambda: Decimal("0"))
+    counts: dict[str, int] = defaultdict(int)
+
+    for r in records:
+        totals[r.user_id] += r.revenue
+        counts[r.user_id] += 1
+
+    return {
+        user: (totals[user] / counts[user]).quantize(Decimal("0.01"))
+        for user in totals
+    }
+
+
+def main() -> None:
+    csv_path = Path(__file__).resolve().parent / "data" / "transactions.csv"
+    records = _load_transactions(csv_path)
+
+    print("=== Assignment 2: Transaction Analysis ===")
+    print(f"Loaded {len(records)} transactions from {csv_path.name}\n")
+
+    total = total_revenue(records)
+    print(f"Total revenue: {total}")
+
+    by_cat = revenue_by_category(records)
+    print("\nRevenue by category:")
+    for cat, value in by_cat.items():
+        print(f"  {cat.value}: {value}")
+
+    physical_total = revenue_for_category(records, Category.PHYSICAL)
+    print(f"\nRevenue for PHYSICAL only: {physical_total}")
+
+    by_user = revenue_by_user(records)
+    print("\nRevenue by user:")
+    for user_id, value in by_user.items():
+        print(f"  {user_id}: {value}")
+
+    avg_by_user = average_revenue_per_user(records)
+    print("\nAverage revenue per user:")
+    for user_id, value in avg_by_user.items():
+        print(f"  {user_id}: {value}")
+
+    top_items = top_n_items_by_revenue(records, n=3)
+    print("\nTop 3 items by revenue:")
+    for item, value in top_items:
+        print(f"  {item}: {value}")
+
+
+if __name__ == "__main__":
+    main()
