@@ -1,6 +1,8 @@
 import os
 import sys
 from pathlib import Path
+import threading
+import time
 
 import pytest
 
@@ -42,4 +44,48 @@ def test_queue_put_and_get_basic() -> None:
     assert queue.size() == 2
     assert queue.get() == 3
     assert queue.get() == 4
+    assert queue.is_empty() is True
+
+
+def test_queue_blocks_get_when_empty_until_item_available() -> None:
+    queue: BlockingQueue[int] = BlockingQueue(max_size=2)
+    result: list[int] = []
+    
+    def consumer() -> None:
+        item = queue.get()
+        result.append(item)
+    
+    t = threading.Thread(target=consumer)
+    t.start()
+    
+    time.sleep(0.05)
+    assert result == []
+    
+    queue.put(42)
+    
+    t.join(timeout=1.0)
+    assert result == [42]
+
+
+def test_queue_blocks_put_when_full_until_space_avilable() -> None:
+    queue: BlockingQueue[int] = BlockingQueue(max_size=1)
+    queue.put(10)
+    
+    blocked = {"value": True}
+    
+    def producer() -> None:
+        queue.put(20)
+        blocked["value"] = False
+    
+    t = threading.Thread(target=producer)
+    t.start()
+    
+    time.sleep(0.05)
+    assert blocked["value"] is True
+    
+    assert queue.get() == 10
+    
+    t.join(timeout=1.0)
+    assert blocked["value"] is False
+    assert queue.get() == 20
     assert queue.is_empty() is True
