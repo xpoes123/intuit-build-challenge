@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 T = TypeVar('T')
 
-@dataclass
+@dataclass(kw_only=True)
 class BlockingQueue(Generic[T]):
     max_size: int = 10
     
